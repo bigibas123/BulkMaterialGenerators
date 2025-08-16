@@ -1,0 +1,107 @@
+﻿#if UNITY_EDITOR
+using System;
+using cc.dingemans.bigibas123.bulkmaterialgenerators.Runtime;
+using UnityEditor;
+using UnityEditor.IMGUI.Controls;
+using UnityEngine;
+
+namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.TextureArrayConverter
+{
+    [CustomPropertyDrawer(typeof(MaterialSlotReference))]
+    public class MaterialSlotReferenceDrawer : PropertyDrawer
+    {
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        {
+            return EditorGUIUtility.singleLineHeight * 7;
+        }
+
+        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        {
+            var curValue = property.boxedValue as MaterialSlotReference;
+            var enabled = curValue.enabled;
+            var renderer = curValue.renderer;
+            var slot = curValue.slot;
+            var menuPath = curValue.menuPath;
+            var sourceProperty = curValue.sourceProperty;
+
+            var targetShader = curValue.targetShader;
+            var targetProperty = curValue.targetProperty;
+
+            label.text = $"Material: {curValue.SourceMaterial.name}";
+            label = EditorGUI.BeginProperty(position, label, property);
+            {
+                position.height = EditorGUIUtility.singleLineHeight;
+                EditorGUI.LabelField(position, label);
+                position.y += EditorGUIUtility.singleLineHeight;
+                EditorGUI.BeginChangeCheck();
+
+                enabled = EditorGUI.Toggle(position, "Convert:", enabled);
+                position.y += EditorGUIUtility.singleLineHeight;
+
+                renderer = EditorGUI.ObjectField(position, new GUIContent("Target Renderer"), renderer,
+                    typeof(Renderer), false) as Renderer;
+                position.y += EditorGUIUtility.singleLineHeight;
+
+                menuPath = EditorGUI.TextField(position, "Menu Path", menuPath);
+                position.y += EditorGUIUtility.singleLineHeight;
+
+                if (curValue.SourceShader != null)
+                {
+                    var possbileSourceProperties = curValue.PossbileSourceProperties;
+                    possbileSourceProperties.Insert(0, "Select...");
+
+                    int selected = possbileSourceProperties.IndexOf(sourceProperty);
+                    selected = (selected == -1 ? 0 : selected);
+
+                    selected = EditorGUI.Popup(position, "Source shader property:", selected,
+                        possbileSourceProperties.ToArray());
+                    position.y += EditorGUIUtility.singleLineHeight;
+
+                    sourceProperty = selected == 0 ? null : possbileSourceProperties[selected];
+                }
+
+                targetShader = EditorGUI.ObjectField(position,
+                    new GUIContent("Target Shader"), targetShader, typeof(Shader), false) as Shader;
+                position.y += EditorGUIUtility.singleLineHeight;
+
+                if (targetShader != null)
+                {
+                    var possibleDestProperties = curValue.PossibleTargetProperties;
+                    possibleDestProperties.Insert(0, "Select...");
+                    int selected = possibleDestProperties.IndexOf(targetProperty);
+                    selected = (selected == -1 ? 0 : selected);
+                    selected = EditorGUI.Popup(position, "Target shader property:", selected,
+                        possibleDestProperties.ToArray());
+                    position.y += EditorGUIUtility.singleLineHeight;
+
+                    targetProperty = selected == 0 ? null : possibleDestProperties[selected];
+
+                    position.y += EditorGUIUtility.singleLineHeight;
+                }
+
+
+                if (EditorGUI.EndChangeCheck())
+                {
+                    var currentConstruct =
+                        new MaterialSlotReference()
+                        {
+                            enabled = enabled,
+                            renderer = renderer,
+                            slot = slot,
+                            menuPath = menuPath,
+                            sourceProperty = sourceProperty,
+                            targetShader = targetShader,
+                            targetProperty = targetProperty
+                        };
+                    if (!currentConstruct.Equals(property.boxedValue))
+                    {
+                        property.boxedValue = currentConstruct;
+                    }
+                }
+
+                EditorGUI.EndProperty();
+            }
+        }
+    }
+}
+#endif

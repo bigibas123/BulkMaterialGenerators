@@ -1,0 +1,77 @@
+name: Create release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  PACKAGE_JSON: "./package.json"
+  PACKAGE_PATH: "."
+
+
+jobs:        
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: 
+          fetch-tags: true
+      - run: |
+          git fetch --unshallow --tags
+          echo $?
+          git tag --list
+      
+      
+      - name: Get package properties
+        id: package_data
+        uses: zoexx/github-action-json-file-properties@d02f28167f05bf70cd75352b11c25a4e8c39bf38
+        with:
+          file_path: "${{ env.PACKAGE_JSON }}"
+
+      - name: Get last tag
+        run: |
+          echo "old_tag=$(git describe --tags --abbrev=0)" | tee -a $GITHUB_ENV
+
+      - name: Parse git tag version
+        id: tag_version
+        uses: madhead/semver-utils@36d1e0ed361bd7b4b77665de8093092eaeabe6ba
+        with:
+          lenient: false
+          version: ${{ env.old_tag || '0.0.0' }}
+          compare-to: ${{ steps.package_data.outputs.version }}
+      - name: Pick Incremented old tag
+        id: tag_pre_release
+        if: ${{ steps.tag_version.outputs.comparison-result != '<' }}
+        run: |
+          echo "version=${{ steps.tag_version.outputs.inc-prerelease  }}" >> $GITHUB_ENV
+      - name: Pick package version
+        id: tag_post_release
+        if: ${{ steps.tag_version.outputs.comparison-result == '<' }}
+        run: |
+          echo "version=${{ steps.package_data.outputs.version }}" >> $GITHUB_ENV
+      - name: Replace version in package.json
+        run: jq ' .version = "${{ env.version }}"' ${{ env.PACKAGE_JSON }}  > tmp && mv tmp ${{ env.PACKAGE_JSON }}
+      
+      - name: Create Package Zip
+        working-directory: "${{ env.PACKAGE_PATH }}"
+        run: zip -r "${{ steps.package_data.outputs.name }}-${{ env.version }}.zip" . -x ".git/*" ".github/*"
+
+      - name: Create Tag
+        id: create_tag
+        uses: rickstaa/action-create-tag@a1c7777fcb2fee4f19b0f283ba888afa11678b72
+        with:
+          tag: ${{ env.version }}
+      
+      - name: Make Release
+        uses: softprops/action-gh-release@72f2c25fcb47643c292f7107632f7a47c1df5cd8
+        with:
+          files: |
+            ${{ steps.package_data.outputs.name }}-${{ env.version }}.unitypackage
+            ${{ steps.package_data.outputs.name }}-${{ env.version }}.zip
+            ${{ env.PACKAGE_JSON }}
+          tag_name: ${{ env.version }}

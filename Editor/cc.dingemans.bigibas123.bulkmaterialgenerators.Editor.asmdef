@@ -1,0 +1,23 @@
+{
+  "name": "cc.dingemans.bigibas123.bulkmaterialgenerators.Editor",
+  "rootNamespace": "cc.dingemans.bigibas123.bulkmaterialgenerators.Editor",
+  "references": [
+    "nadena.dev.ndmf",
+    "nadena.dev.ndmf.vrchat",
+    "com.vrcfury.api",
+    "VRC.SDKBase.Editor",
+    "cc.dingemans.bigibas123.bulkmaterialgenerators.Runtime"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [
+  ],
+  "noEngineReferences": false
+}
