@@ -19,6 +19,7 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.TextureArrayConv
                     slot.Process();
                 }
             }
+            Object.DestroyImmediate(settings);
         }
 
         public static void Process(this Runtime.MaterialSlotReference setting)
