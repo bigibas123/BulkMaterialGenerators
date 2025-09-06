@@ -22,11 +22,11 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.TextureArrayConv
             Object.DestroyImmediate(settings);
         }
 
-        public static void Process(this Runtime.MaterialSlotReference setting)
+        public static void Process(this Runtime.TextureArrayConverterMaterialSlotReference setting)
         {
             var resultMaterials = setting.SourceTextureArray
                 .ToTexture2DList()
-                .ToMaterials(setting.SourceMaterial, setting.sourceProperty, setting.targetShader,
+                .ToMaterials(setting.Material, setting.sourceProperty, setting.targetShader,
                     setting.targetProperty);
 
             var sharedMats = setting.renderer.sharedMaterials;

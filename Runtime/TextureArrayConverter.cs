@@ -12,11 +12,11 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Runtime
     public class TextureArrayConverter : MonoBehaviour, IEditorOnly
     {
         public Renderer Renderer => gameObject.GetComponent<Renderer>();
-        public List<MaterialSlotReference> slots = new();
+        public List<TextureArrayConverterMaterialSlotReference> slots = new();
 
-        public List<MaterialSlotReference> PossibleTargets => Renderer.sharedMaterials
-            .Select(((_, i) => new MaterialSlotReference() { renderer = Renderer, slot = i }))
-            .Where(msr => ContainsTextureArrayProperty(msr.SourceMaterial))
+        public List<TextureArrayConverterMaterialSlotReference> PossibleTargets => Renderer.sharedMaterials
+            .Select(((_, i) => new TextureArrayConverterMaterialSlotReference() { renderer = Renderer, slot = i }))
+            .Where(msr => ContainsTextureArrayProperty(msr.Material))
             .ToList();
 
         private bool ContainsTextureArrayProperty(Material material)
@@ -30,28 +30,20 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Runtime
     }
 
     [Serializable]
-    public class MaterialSlotReference
+    public class TextureArrayConverterMaterialSlotReference : MaterialSlotTarget
     {
-        public bool enabled;
-        public Renderer renderer;
-        public int slot;
         public string menuPath;
         public string sourceProperty;
         public Shader targetShader;
         public string targetProperty;
-
-        public Shader SourceShader => renderer.sharedMaterials[slot].shader;
         
-        public Texture2DArray SourceTextureArray => SourceMaterial.GetTexture(sourceProperty) as Texture2DArray;
-        public Material SourceMaterial => renderer != null && renderer.sharedMaterials.Length > slot
-            ? renderer.sharedMaterials[slot]
-            : null;
+        public Texture2DArray SourceTextureArray => Material.GetTexture(sourceProperty) as Texture2DArray;
 
         public List<string> PossbileSourceProperties =>
-            SourceShader != null ? Enumerable.Range(0, SourceShader.GetPropertyCount())
-            .Where(id => SourceShader.GetPropertyType(id) == ShaderPropertyType.Texture)
-            .Where(id => SourceShader.GetPropertyTextureDimension(id) == TextureDimension.Tex2DArray)
-            .Select(id => SourceShader.GetPropertyName(id)).ToList() : new List<string>();
+            Shader != null ? Enumerable.Range(0, Shader.GetPropertyCount())
+            .Where(id => Shader.GetPropertyType(id) == ShaderPropertyType.Texture)
+            .Where(id => Shader.GetPropertyTextureDimension(id) == TextureDimension.Tex2DArray)
+            .Select(id => Shader.GetPropertyName(id)).ToList() : new List<string>();
 
         public List<string> PossibleTargetProperties => targetShader != null ?
             Enumerable.Range(0, targetShader.GetPropertyCount())

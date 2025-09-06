@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.TextureArrayConverter
 {
-    [CustomPropertyDrawer(typeof(MaterialSlotReference))]
+    [CustomPropertyDrawer(typeof(TextureArrayConverterMaterialSlotReference))]
     public class MaterialSlotReferenceDrawer : PropertyDrawer
     {
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
@@ -17,7 +17,7 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.TextureArrayConv
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            var curValue = property.boxedValue as MaterialSlotReference;
+            var curValue = property.boxedValue as TextureArrayConverterMaterialSlotReference;
             var enabled = curValue.enabled;
             var renderer = curValue.renderer;
             var slot = curValue.slot;
@@ -27,7 +27,7 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.TextureArrayConv
             var targetShader = curValue.targetShader;
             var targetProperty = curValue.targetProperty;
 
-            label.text = $"Material: {curValue.SourceMaterial.name}";
+            label.text = $"Material: {curValue.Material.name}";
             label = EditorGUI.BeginProperty(position, label, property);
             {
                 position.height = EditorGUIUtility.singleLineHeight;
@@ -45,7 +45,7 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.TextureArrayConv
                 menuPath = EditorGUI.TextField(position, "Menu Path", menuPath);
                 position.y += EditorGUIUtility.singleLineHeight;
 
-                if (curValue.SourceShader != null)
+                if (curValue.Shader != null)
                 {
                     var possbileSourceProperties = curValue.PossbileSourceProperties;
                     possbileSourceProperties.Insert(0, "Select...");
@@ -83,7 +83,7 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.TextureArrayConv
                 if (EditorGUI.EndChangeCheck())
                 {
                     var currentConstruct =
-                        new MaterialSlotReference()
+                        new TextureArrayConverterMaterialSlotReference()
                         {
                             enabled = enabled,
                             renderer = renderer,
