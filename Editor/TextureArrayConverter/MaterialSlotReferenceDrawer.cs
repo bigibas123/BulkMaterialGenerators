@@ -26,8 +26,8 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.TextureArrayConv
 
             var targetShader = curValue.targetShader;
             var targetProperty = curValue.targetProperty;
-
-            label.text = $"Material: {curValue.Material.name}";
+            
+            label.text = $"Material: {curValue.Material?.name ?? curValue.renderer?.name ?? ""}";
             label = EditorGUI.BeginProperty(position, label, property);
             {
                 position.height = EditorGUIUtility.singleLineHeight;
@@ -42,6 +42,9 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.TextureArrayConv
                     typeof(Renderer), false) as Renderer;
                 position.y += EditorGUIUtility.singleLineHeight;
 
+                slot = EditorGUI.IntSlider(position, "Slot", slot, 0, (curValue?.renderer?.sharedMaterials.Length - 1 ?? 0));
+                position.y += EditorGUIUtility.singleLineHeight;
+                
                 menuPath = EditorGUI.TextField(position, "Menu Path", menuPath);
                 position.y += EditorGUIUtility.singleLineHeight;
 

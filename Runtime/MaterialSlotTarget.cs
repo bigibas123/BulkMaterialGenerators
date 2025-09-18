@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Runtime
@@ -11,11 +12,12 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Runtime
         public int slot;
         
         
+        [CanBeNull]
         public Material Material => renderer != null && renderer.sharedMaterials.Length > slot
             ? renderer.sharedMaterials[slot]
             : null;
             
-        public Shader Shader => Material.shader;
+        [CanBeNull] public Shader Shader => Material?.shader;
         
 
     }

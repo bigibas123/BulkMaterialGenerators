@@ -1,4 +1,5 @@
 using cc.dingemans.bigibas123.bulkmaterialgenerators.Editor;
+using cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.MaterialVariantGen;
 using cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.TextureArrayConverter;
 using nadena.dev.ndmf;
 
@@ -8,22 +9,47 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor
 {
     public class BulkMaterialGenerators : Plugin<BulkMaterialGenerators>
     {
-        public override string QualifiedName => "cc.dingemans.bigibas123.bigishader.BulkMaterialGenerators";
-        public override string DisplayName => "LogoPlane Splitter";
-
-        public static readonly string TAG = "[LogoPlaneSplitter]";
+        public static readonly string SQualifiedName = "cc.dingemans.bigibas123.bigishader.BulkMaterialGenerators";
+        public static readonly string SDisplayName = "Bulk Material Generators";
+        public override string QualifiedName => SQualifiedName;
+        public override string DisplayName => SDisplayName;
 
         protected override void Configure()
         {
             InPhase(BuildPhase.Generating)
-                .Run("Convert textureArray shader to normal ", ctx =>
+                .Run(new ConvertTextureArrayPass());
+            InPhase(BuildPhase.Generating)
+                .Run(new MaterialVariantGenPass());
+        }
+
+        public class ConvertTextureArrayPass : Pass<ConvertTextureArrayPass>
+        {
+            public override string QualifiedName => SQualifiedName + ".ConvertTextureArray";
+            public override string DisplayName => $"[{SDisplayName}] Convert textureArray shader to normal";
+
+            protected override void Execute(BuildContext context)
+            {
+                var targets = context.AvatarRootObject.GetComponentsInChildren<Runtime.TextureArrayConverter>();
+                foreach (var converter in targets)
                 {
-                    var targets = ctx.AvatarRootObject.GetComponentsInChildren<Runtime.TextureArrayConverter>();
-                    foreach (var converter in targets)
-                    {
-                        converter.Process();
-                    }
-                });
+                    converter.Process();
+                }
+            }
+        }
+
+        public class MaterialVariantGenPass : Pass<MaterialVariantGenPass>
+        {
+            public override string QualifiedName => SQualifiedName + ".MaterialVariantGen";
+            public override string DisplayName => $"[{SDisplayName}] Generate Materials from list of textures";
+
+            protected override void Execute(BuildContext context)
+            {
+                var targets = context.AvatarRootObject.GetComponentsInChildren<Runtime.MaterialVariantGen>();
+                foreach (var converter in targets)
+                {
+                    converter.Process();
+                }
+            }
         }
     }
 }
