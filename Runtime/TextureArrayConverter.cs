@@ -23,7 +23,8 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Runtime
         {
             return material.GetTexturePropertyNames()
                 .Select(propName => material.shader.FindPropertyIndex(propName))
-                .Where(id => material.shader.GetPropertyType(id) == ShaderPropertyType.Texture)
+                .Where(id => material.shader.GetPropertyCount() > id &&
+                             material.shader.GetPropertyType(id) == ShaderPropertyType.Texture)
                 .Select(id => material.shader.GetPropertyTextureDimension(id))
                 .Any(dim => dim == TextureDimension.Tex2DArray);
         }
