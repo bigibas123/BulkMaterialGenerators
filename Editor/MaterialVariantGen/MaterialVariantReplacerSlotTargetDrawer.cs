@@ -16,7 +16,7 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.MaterialVariantG
                 multiplier = 0;
             }
 
-            else if (curValue.renderer == null)
+            else if (!curValue.renderer)
             {
                 multiplier = 1;
             }
@@ -39,7 +39,7 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.MaterialVariantG
                 position.height = EditorGUIUtility.singleLineHeight;
                 EditorGUI.LabelField(position, label);
                 position.y += EditorGUIUtility.singleLineHeight;
-                if (curValue.renderer == null) return;
+                if (!curValue.renderer) return;
 
                 var enabled = curValue.enabled;
                 var renderer = curValue.renderer;
@@ -64,7 +64,7 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.MaterialVariantG
                 position.y += EditorGUIUtility.singleLineHeight;
 
 
-                if (curValue.Material?.shader != null)
+                if (curValue.Material?.shader)
                 {
                     var possibleDestProperties = curValue.PossibleTargetProperties;
                     possibleDestProperties.Insert(0, "Select...");

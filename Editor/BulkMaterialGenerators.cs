@@ -14,12 +14,19 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor
         public override string QualifiedName => SQualifiedName;
         public override string DisplayName => SDisplayName;
 
+        public static class Passes
+        {
+            public static readonly ConvertTextureArrayPass ConvertTextureArrayPass = new();
+            public static readonly MaterialVariantGenPass MaterialVariantGentPass = new();
+        }
+
+
         protected override void Configure()
         {
             InPhase(BuildPhase.Generating)
-                .Run(new ConvertTextureArrayPass());
+                .Run(Passes.ConvertTextureArrayPass);
             InPhase(BuildPhase.Generating)
-                .Run(new MaterialVariantGenPass());
+                .Run(Passes.MaterialVariantGentPass);
         }
 
         public class ConvertTextureArrayPass : Pass<ConvertTextureArrayPass>
@@ -29,7 +36,7 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor
 
             protected override void Execute(BuildContext context)
             {
-                var targets = context.AvatarRootObject.GetComponentsInChildren<Runtime.TextureArrayConverter>();
+                var targets = context.AvatarRootObject.GetComponentsInChildren<Runtime.TextureArrayConverter>(true);
                 foreach (var converter in targets)
                 {
                     converter.Process();
@@ -44,7 +51,7 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor
 
             protected override void Execute(BuildContext context)
             {
-                var targets = context.AvatarRootObject.GetComponentsInChildren<Runtime.MaterialVariantGen>();
+                var targets = context.AvatarRootObject.GetComponentsInChildren<Runtime.MaterialVariantGen>(true);
                 foreach (var converter in targets)
                 {
                     converter.Process();
