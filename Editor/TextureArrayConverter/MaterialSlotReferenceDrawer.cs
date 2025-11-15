@@ -23,7 +23,7 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.TextureArrayConv
 
                 if (curValue.targetShader)
                 {
-                    ++multiplier;
+                    multiplier += 2;
                 }
             }
 
@@ -43,6 +43,8 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.TextureArrayConv
 
                 var targetShader = curValue.targetShader;
                 var targetProperty = curValue.targetProperty;
+
+                var flipProperty = curValue.flipProperty;
 
                 label.text = $"Material: {curValue.Material?.name ?? curValue.renderer?.name ?? ""}";
                 label = EditorGUI.BeginProperty(position, label, property);
@@ -96,8 +98,19 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.TextureArrayConv
                         position.y += EditorGUIUtility.singleLineHeight;
 
                         targetProperty = selected == 0 ? null : possibleDestProperties[selected];
+                    }
 
+                    if (targetShader)
+                    {
+                        var possibleFlipProperties = curValue.PossbileFlippableProperties;
+                        possibleFlipProperties.Insert(0, "Select...");
+                        int selected = possibleFlipProperties.IndexOf(flipProperty);
+                        selected = (selected == -1 ? 0 : selected);
+                        selected = EditorGUI.Popup(position, "Target shader property to flip:", selected,
+                            possibleFlipProperties.ToArray());
                         position.y += EditorGUIUtility.singleLineHeight;
+
+                        flipProperty = selected == 0 ? null : possibleFlipProperties[selected];
                     }
 
 
@@ -112,7 +125,8 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.TextureArrayConv
                                 menuPath = menuPath,
                                 sourceProperty = sourceProperty,
                                 targetShader = targetShader,
-                                targetProperty = targetProperty
+                                targetProperty = targetProperty,
+                                flipProperty = flipProperty,
                             };
                         if (!currentConstruct.Equals(property.boxedValue))
                         {

@@ -37,19 +37,33 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Runtime
         public string sourceProperty;
         public Shader targetShader;
         public string targetProperty;
-        
+
+        public string flipProperty;
+
         public Texture2DArray SourceTextureArray => Material.GetTexture(sourceProperty) as Texture2DArray;
 
         public List<string> PossbileSourceProperties =>
-            Shader != null ? Enumerable.Range(0, Shader.GetPropertyCount())
-            .Where(id => Shader.GetPropertyType(id) == ShaderPropertyType.Texture)
-            .Where(id => Shader.GetPropertyTextureDimension(id) == TextureDimension.Tex2DArray)
-            .Select(id => Shader.GetPropertyName(id)).ToList() : new List<string>();
+            Shader != null
+                ? Enumerable.Range(0, Shader.GetPropertyCount())
+                    .Where(id => Shader.GetPropertyType(id) == ShaderPropertyType.Texture)
+                    .Where(id => Shader.GetPropertyTextureDimension(id) == TextureDimension.Tex2DArray)
+                    .Select(id => Shader.GetPropertyName(id)).ToList()
+                : new List<string>();
 
-        public List<string> PossibleTargetProperties => targetShader != null ?
-            Enumerable.Range(0, targetShader.GetPropertyCount())
+        public List<string> PossibleTargetProperties => targetShader != null
+            ? Enumerable.Range(0, targetShader.GetPropertyCount())
                 .Where(id => targetShader.GetPropertyType(id) == ShaderPropertyType.Texture)
                 .Where(id => targetShader.GetPropertyTextureDimension(id) == TextureDimension.Tex2D)
-                .Select(id => targetShader.GetPropertyName(id)).ToList() : new List<string>();
+                .Select(id => targetShader.GetPropertyName(id)).ToList()
+            : new List<string>();
+
+        public List<string> PossbileFlippableProperties => targetShader != null
+            ? Enumerable.Range(0, targetShader.GetPropertyCount())
+                .Where(id =>
+                    targetShader.GetPropertyType(id) == ShaderPropertyType.Float ||
+                    targetShader.GetPropertyType(id) == ShaderPropertyType.Range ||
+                    targetShader.GetPropertyType(id) == ShaderPropertyType.Int)
+                .Select(id => targetShader.GetPropertyName(id)).ToList()
+            : new List<string>();
     }
 }

@@ -1,11 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.Utils;
 using com.vrcfury.api;
 using com.vrcfury.api.Actions;
 using com.vrcfury.api.Components;
-using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering;
+using Object = UnityEngine.Object;
 
 namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.TextureArrayConverter
 {
@@ -28,7 +30,7 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.TextureArrayConv
             var resultMaterials = setting.SourceTextureArray
                 .ToTexture2DList()
                 .ToMaterials(setting.Material, setting.sourceProperty, setting.targetShader,
-                    setting.targetProperty);
+                    setting.targetProperty, setting.flipProperty);
 
             var sharedMats = setting.renderer.sharedMaterials;
             sharedMats[setting.slot] = resultMaterials.First();
@@ -77,7 +79,7 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.TextureArrayConv
 
 
         public static List<Material> ToMaterials(this List<Texture2D> array, Material sourceMaterial,
-            string sourceProperty, Shader destShader, string destProperty)
+            string sourceProperty, Shader destShader, string destProperty, string flipProperty)
         {
             return array.Select((tex, i) =>
             {
@@ -86,8 +88,57 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.TextureArrayConv
                     shader = destShader,
                     name = $"{sourceMaterial.name}[{i}]"
                 };
+                mat.SetTexture(sourceProperty, null);
                 mat.SetTexture(destProperty, tex);
-                mat.SetTexture(sourceProperty, tex);
+                if (string.IsNullOrWhiteSpace(flipProperty)) return mat;
+
+                // Flip property logic
+                var propIndex = destShader.FindPropertyIndex(flipProperty);
+                var propId = Shader.PropertyToID(flipProperty);
+                var type = destShader.GetPropertyType(propIndex);
+                switch (type)
+                {
+                    case ShaderPropertyType.Int:
+                    {
+                        int iValue = mat.GetInt(propId);
+                        if (iValue > 0)
+                        {
+                            mat.SetInt(propId, 0);
+                        }
+                        else
+                        {
+                            mat.SetInt(propId, 1);
+                        }
+
+                        break;
+                    }
+                    case ShaderPropertyType.Float:
+                    case ShaderPropertyType.Range:
+                        float fValue = mat.GetFloat(propId);
+                        if (fValue > Single.Epsilon)
+                        {
+                            mat.SetFloat(propId, 0);
+                        }
+                        else
+                        {
+                            mat.SetFloat(propId, 1);
+                        }
+
+                        break;
+
+                    case ShaderPropertyType.Color:
+                    case ShaderPropertyType.Vector:
+                    case ShaderPropertyType.Texture:
+                    default:
+                        throw new ArgumentOutOfRangeException(flipProperty,
+                            $"property to flip is of non-flippable type: {nameof(type)}");
+                }
+
+                if (mat.enabledKeywords.Select(kw => { return kw.name; }).Contains("MULTI_TEXTURE"))
+                {
+                    mat.DisableKeyword("MULTI_TEXTURE");
+                }
+
                 return mat;
             }).ToList();
         }
