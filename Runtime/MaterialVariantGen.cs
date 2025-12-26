@@ -19,6 +19,7 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Runtime
             public string menuPath;
             public string targetProperty;
             public List<Texture> textures = new List<Texture>();
+            public bool savedBetweenWorlds;
             
             // Get the dimension of the textures list, any means empty, null means mixed
             public TextureDimension? Dimension =>

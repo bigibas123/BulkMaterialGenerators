@@ -32,6 +32,10 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.MaterialVariantG
             FuryToggle toggle = FuryComponents.CreateToggle(setting.renderer.gameObject);
             toggle.SetMenuPath(setting.menuPath);
             toggle.SetSlider();
+            if (setting.savedBetweenWorlds)
+            {
+                toggle.SetSaved();
+            }
             
             var mainActions = toggle.GetActions();
             FuryFlipbookBuilder flipbook = mainActions.AddFlipbookBuilder();

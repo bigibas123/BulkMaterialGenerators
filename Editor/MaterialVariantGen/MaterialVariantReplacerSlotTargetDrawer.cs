@@ -22,7 +22,7 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.MaterialVariantG
             }
             else
             {
-                multiplier = 5;
+                multiplier = 6;
             }
 
             return multiplier * EditorGUIUtility.singleLineHeight;
@@ -54,6 +54,7 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.MaterialVariantG
                 var renderer = curValue.renderer;
                 var slot = curValue.slot;
                 var menuPath = curValue.menuPath;
+                var savedBetweenWorlds = curValue.savedBetweenWorlds;
                 var textures = curValue.textures;
                 var targetProperty = curValue.targetProperty;
 
@@ -67,6 +68,9 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.MaterialVariantG
                 position.y += EditorGUIUtility.singleLineHeight;
 
                 menuPath = EditorGUI.TextField(position, "Menu Path", menuPath);
+                position.y += EditorGUIUtility.singleLineHeight;
+                
+                savedBetweenWorlds = EditorGUI.Toggle(position, "Saved between worlds", savedBetweenWorlds);
                 position.y += EditorGUIUtility.singleLineHeight;
 
 
@@ -97,6 +101,7 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.MaterialVariantG
                     boxValue.renderer = renderer;
                     boxValue.slot = slot;
                     boxValue.menuPath = menuPath;
+                    boxValue.savedBetweenWorlds = savedBetweenWorlds;
                     boxValue.targetProperty = targetProperty;
                     property.boxedValue = boxValue;
                 }
