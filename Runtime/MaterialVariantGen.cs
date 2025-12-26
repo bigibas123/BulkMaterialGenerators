@@ -11,13 +11,7 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Runtime
     [RequireComponent(typeof(Renderer))]
     public class MaterialVariantGen : MonoBehaviour, IEditorOnly
     {
-        public Renderer Renderer => gameObject.GetComponent<Renderer>();
         public List<MaterialVariantReplacerSlotTarget> slots = new();
-        
-        public List<MaterialVariantReplacerSlotTarget> PossibleTargets => Renderer.sharedMaterials
-            .Select(((_, i) => new MaterialVariantReplacerSlotTarget() { renderer = Renderer, slot = i }))
-            .Where(msr => msr.PossibleTargetProperties.Count > 0)
-            .ToList();
 
         [Serializable]
         public class MaterialVariantReplacerSlotTarget : MaterialSlotTarget

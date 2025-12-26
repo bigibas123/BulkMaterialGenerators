@@ -22,7 +22,7 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.MaterialVariantG
             }
             else
             {
-                multiplier = 6;
+                multiplier = 5;
             }
 
             return multiplier * EditorGUIUtility.singleLineHeight;
@@ -33,7 +33,17 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.MaterialVariantG
             var curValue = property.boxedValue as Runtime.MaterialVariantGen.MaterialVariantReplacerSlotTarget;
             if (curValue == null) return;
 
-            label.text = $"Slot: {curValue.Material?.name ?? curValue.renderer?.name ?? ""}";
+            string name = "Nothing selected";
+            if (curValue.Material)
+            {
+                name = curValue.Material.name;
+            }
+            else if (curValue.renderer)
+            {
+                name = curValue.renderer?.name;
+            }
+
+            label.text = $"Slot: {name}";
             label = EditorGUI.BeginProperty(position, label, property);
             {
                 position.height = EditorGUIUtility.singleLineHeight;
@@ -41,7 +51,6 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.MaterialVariantG
                 position.y += EditorGUIUtility.singleLineHeight;
                 if (!curValue.renderer) return;
 
-                var enabled = curValue.enabled;
                 var renderer = curValue.renderer;
                 var slot = curValue.slot;
                 var menuPath = curValue.menuPath;
@@ -49,9 +58,6 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.MaterialVariantG
                 var targetProperty = curValue.targetProperty;
 
                 EditorGUI.BeginChangeCheck();
-                
-                enabled = EditorGUI.Toggle(position, "Convert:", enabled);
-                position.y += EditorGUIUtility.singleLineHeight;
 
                 renderer = EditorGUI.ObjectField(position, new GUIContent("Target Renderer"), renderer,
                     typeof(Renderer), false) as Renderer;
@@ -76,28 +82,23 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.MaterialVariantG
 
                     targetProperty = selected == 0 ? null : possibleDestProperties[selected];
                 }
-                
-                var texturesProperty = property.FindPropertyRelative(nameof(Runtime.MaterialVariantGen.MaterialVariantReplacerSlotTarget.textures));
+
+                var texturesProperty =
+                    property.FindPropertyRelative(nameof(Runtime.MaterialVariantGen.MaterialVariantReplacerSlotTarget
+                        .textures));
                 EditorGUILayout.PropertyField(texturesProperty, new GUIContent("Textures"));
                 property.serializedObject.ApplyModifiedProperties();
 
 
                 if (EditorGUI.EndChangeCheck())
                 {
-                    var currentConstruct =
-                        new Runtime.MaterialVariantGen.MaterialVariantReplacerSlotTarget()
-                        {
-                            enabled = enabled,
-                            renderer = renderer,
-                            slot = slot,
-                            menuPath = menuPath,
-                            targetProperty = targetProperty,
-                            textures = textures,
-                        };
-                    if (!currentConstruct.Equals(property.boxedValue))
-                    {
-                        property.boxedValue = currentConstruct;
-                    }
+                    var boxValue =
+                        (property.boxedValue as Runtime.MaterialVariantGen.MaterialVariantReplacerSlotTarget);
+                    boxValue.renderer = renderer;
+                    boxValue.slot = slot;
+                    boxValue.menuPath = menuPath;
+                    boxValue.targetProperty = targetProperty;
+                    property.boxedValue = boxValue;
                 }
             }
         }

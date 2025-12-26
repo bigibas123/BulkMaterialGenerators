@@ -11,11 +11,11 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.TextureArrayConv
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
             var curValue = property.boxedValue as TextureArrayConverterMaterialSlotReference;
-            float multiplier = 0;
+            float multiplier = 1;
 
             if (curValue != null)
             {
-                multiplier += 6;
+                multiplier += 5;
                 if (curValue.Shader)
                 {
                     ++multiplier;
@@ -35,7 +35,6 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.TextureArrayConv
             var curValue = property.boxedValue as TextureArrayConverterMaterialSlotReference;
             if (curValue != null)
             {
-                var enabled = curValue.enabled;
                 var renderer = curValue.renderer;
                 var slot = curValue.slot;
                 var menuPath = curValue.menuPath;
@@ -46,16 +45,23 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.TextureArrayConv
 
                 var flipProperty = curValue.flipProperty;
 
-                label.text = $"Material: {curValue.Material?.name ?? curValue.renderer?.name ?? ""}";
+                string name = "Nothing selected";
+                if (curValue.Material)
+                {
+                    name = curValue.Material.name;
+                }else if (curValue.renderer)
+                {
+                    name = curValue.renderer?.name;
+                }
+            
+                label.text = $"Slot: {name}";
                 label = EditorGUI.BeginProperty(position, label, property);
                 {
                     position.height = EditorGUIUtility.singleLineHeight;
                     EditorGUI.LabelField(position, label);
                     position.y += EditorGUIUtility.singleLineHeight;
                     EditorGUI.BeginChangeCheck();
-
-                    enabled = EditorGUI.Toggle(position, "Convert:", enabled);
-                    position.y += EditorGUIUtility.singleLineHeight;
+                    
 
                     renderer = EditorGUI.ObjectField(position, new GUIContent("Target Renderer"), renderer,
                         typeof(Renderer), false) as Renderer;
@@ -116,22 +122,14 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.TextureArrayConv
 
                     if (EditorGUI.EndChangeCheck())
                     {
-                        var currentConstruct =
-                            new TextureArrayConverterMaterialSlotReference()
-                            {
-                                enabled = enabled,
-                                renderer = renderer,
-                                slot = slot,
-                                menuPath = menuPath,
-                                sourceProperty = sourceProperty,
-                                targetShader = targetShader,
-                                targetProperty = targetProperty,
-                                flipProperty = flipProperty,
-                            };
-                        if (!currentConstruct.Equals(property.boxedValue))
-                        {
-                            property.boxedValue = currentConstruct;
-                        }
+                        var boxValue = property.boxedValue as TextureArrayConverterMaterialSlotReference;
+                        boxValue.renderer = renderer;
+                        boxValue.slot = slot;
+                        boxValue.menuPath = menuPath;
+                        boxValue.sourceProperty = sourceProperty;
+                        boxValue.targetShader = targetShader;
+                        boxValue.targetProperty = targetProperty;
+                        boxValue.flipProperty = flipProperty;
                     }
 
                     EditorGUI.EndProperty();

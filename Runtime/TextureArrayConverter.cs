@@ -11,13 +11,7 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Runtime
     [RequireComponent(typeof(Renderer))]
     public class TextureArrayConverter : MonoBehaviour, IEditorOnly
     {
-        public Renderer Renderer => gameObject.GetComponent<Renderer>();
         public List<TextureArrayConverterMaterialSlotReference> slots = new();
-
-        public List<TextureArrayConverterMaterialSlotReference> PossibleTargets => Renderer.sharedMaterials
-            .Select(((_, i) => new TextureArrayConverterMaterialSlotReference() { renderer = Renderer, slot = i }))
-            .Where(msr => ContainsTextureArrayProperty(msr.Material))
-            .ToList();
 
         private bool ContainsTextureArrayProperty(Material material)
         {

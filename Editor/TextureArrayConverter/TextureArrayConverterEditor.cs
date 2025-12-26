@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System.Linq;
+using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -23,39 +24,9 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.TextureArrayConv
             foreach (var tgt in targets)
             {
                 if (tgt is not Runtime.TextureArrayConverter setting) continue;
-                
-                
-                var targetRenderer = setting.Renderer;
-                setting.slots.ForEach(slot => slot.renderer = targetRenderer);
-
-                int posibleCount = setting.PossibleTargets.Count;
-                int slotsCount = setting.slots.Count;
-                if (posibleCount < slotsCount)
-                {
-                    setting.slots.RemoveRange(posibleCount,
-                        slotsCount - posibleCount);
-                }
-                else if (posibleCount > slotsCount)
-                {
-                    foreach (var possibleTarget in setting.PossibleTargets)
-                    {
-                        bool found = false;
-
-                        foreach (var existingSlot in setting.slots)
-                        {
-                            if (possibleTarget.renderer == existingSlot.renderer &&
-                                possibleTarget.slot == existingSlot.slot)
-                            {
-                                found = true;
-                                break;
-                            }
-                        }
-
-                        if (!found)
-                        {
-                            setting.slots.Add(possibleTarget);
-                        }
-                    }
+                var targetRenderer = setting.GetComponent<Renderer>();
+                foreach (var slot in setting.slots.Where(slot => slot.renderer == null)){
+                    slot.renderer = targetRenderer;
                 }
             }
 

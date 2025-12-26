@@ -15,10 +15,7 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.MaterialVariantG
         {
             foreach (var slot in settings.slots)
             {
-                if (slot.enabled)
-                {
                     slot.Process();
-                }
             }
 
             Object.DestroyImmediate(settings);

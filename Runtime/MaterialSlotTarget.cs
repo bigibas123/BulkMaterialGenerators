@@ -7,7 +7,6 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Runtime
     [Serializable]
     public class MaterialSlotTarget
     {
-        public bool enabled;
         public Renderer renderer;
         public int slot;
         
