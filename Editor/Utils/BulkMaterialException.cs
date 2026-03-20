@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.Locale;
 using nadena.dev.ndmf;
 using nadena.dev.ndmf.localization;
 
@@ -66,16 +67,7 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.Utils
             _exception = exception;
         }
 
-        public static List<(string, Func<string, string>)> translators = new List<(string, Func<string, string>)>()
-        {
-            ("en-US", str => str),
-        };
-
-        public static Func<List<(string, Func<string, string>)>> translatorLoader = () => { return translators; };
-
-        public static Localizer BGMLocalizer = new Localizer("en-US", translatorLoader);
-
-        public override Localizer Localizer => BGMLocalizer;
+        public override Localizer Localizer => BMGLocalizer.L;
         public override string TitleKey => $"BMG:{_exception.Message}";
         public override string[] TitleSubst => _exception.MessageSubstitutions;
         public override ErrorSeverity Severity => _exception.Severity;
