@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.Rendering;
 using VRC.SDKBase;
@@ -34,7 +35,7 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Runtime
 
         public string flipProperty;
 
-        public Texture2DArray SourceTextureArray => Material.GetTexture(sourceProperty) as Texture2DArray;
+        [CanBeNull] public Texture2DArray SourceTextureArray => Material != null ? Material.GetTexture(sourceProperty) as Texture2DArray : null;
 
         public List<string> PossbileSourceProperties =>
             Shader != null

@@ -5,6 +5,7 @@ using cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.Utils;
 using com.vrcfury.api;
 using com.vrcfury.api.Actions;
 using com.vrcfury.api.Components;
+using nadena.dev.ndmf;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
@@ -15,16 +16,50 @@ namespace cc.dingemans.bigibas123.bulkmaterialgenerators.Editor.TextureArrayConv
     {
         public static void Process(this Runtime.TextureArrayConverter settings)
         {
+            List<Exception> errors = new List<Exception>();
             foreach (var slot in settings.slots)
             {
+                try
+                {
                     slot.Process();
+                }
+                catch (Exception e)
+                {
+                    errors.Add(e);
+                }
             }
-            Object.DestroyImmediate(settings);
+            
+            if (errors.Count > 0)
+            {
+                foreach (var error in errors)
+                {
+                    if (error is not BulkMaterialException boxedError)
+                    {
+                        boxedError =
+                            new BulkMaterialException(ErrorSeverity.Error, error, "An internal error occurred");
+                    }
+
+                    boxedError.AddReference(settings);
+                    ErrorReport.ReportError(boxedError.Error);
+                }
+            }
+            else
+            {
+                Object.DestroyImmediate(settings);
+            }
         }
 
         public static void Process(this Runtime.TextureArrayConverterMaterialSlotReference setting)
         {
-            var resultMaterials = setting.SourceTextureArray
+            Texture2DArray sourceTexArray = setting.SourceTextureArray;
+            if (!sourceTexArray)
+            {
+                throw new BulkMaterialException(ErrorSeverity.Error,
+                    "Texture Array can't be found on property: {0} on Material {1}", setting.sourceProperty,
+                    setting.Material?.name);
+            }
+
+            var resultMaterials = sourceTexArray
                 .ToTexture2DList()
                 .ToMaterials(setting.Material, setting.sourceProperty, setting.targetShader,
                     setting.targetProperty, setting.flipProperty);
